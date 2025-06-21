@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WPAI-Master Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 5px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px 20px;
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            white-space: nowrap;
+            min-width: 150px;
+        }
+
+        .tab.active {
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .tab-content {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+        }
+
+        .message-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .message-item {
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .message-user {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .message-time {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .message-text {
+            color: #333;
+            line-height: 1.5;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-online {
+            background: #51cf66;
+            box-shadow: 0 0 10px rgba(81, 207, 102, 0.5);
+        }
+
+        .status-offline {
+            background: #ff6b6b;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e1e5e9;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e1e5e9;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-color: #28a745;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border-color: #ffc107;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-color: #dc3545;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab {
+                margin-bottom: 5px;
+            }
+            
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 WPAI-Master Dashboard</h1>
+            <p>AI-Powered WhatsApp Agent Management System</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalMessages">1,247</div>
+                <div class="stat-label">Total Messages</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="activeUsers">23</div>
+                <div class="stat-label">Active Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="aiAccuracy">94%</div>
+                <div class="stat-label">AI Accuracy</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">
+                    <span class="status-indicator status-online"></span>Online
+                </div>
+                <div class="stat-label">System Status</div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('dashboard')">📊 Dashboard</button>
+            <button class="tab" onclick="showTab('messages')">💬 Messages</button>
+            <button class="tab" onclick="showTab('users')">👥 Users</button>
+            <button class="tab" onclick="showTab('ai-config')">🧠 AI Config</button>
+            <button class="tab" onclick="showTab('training')">📚 Training</button>
+            <button class="tab" onclick="showTab('settings')">⚙️ Settings</button>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <div class="section">
+                <h3>📈 System Overview</h3>
+                <div class="grid-2">
+                    <div class="card">
+                        <h4>Recent Activity</h4>
+                        <div class="message-list" style="max-height: 250px;">
+                            <div class="message-item">
+                                <div class="message-header">
+                                    <span class="message-user">Ali Ahmed</span>
+                                    <span class="message-time">2 min ago</span>
+                                </div>
+                                <div class="message-text">AI ne customer query ka perfect reply diya!</div>
+                            </div>
+                            <div class="message-item">
+                                <div class="message-header">
+                                    <span class="message-user">Sara Khan</span>
+                                    <span class="message-time">5 min ago</span>
+                                </div>
+                                <div class="message-text">Product ke bare mein poocha, AI ne details share kiye.</div>
+                            </div>
+                            <div class="message-item">
+                                <div class="message-header">
+                                    <span class="message-user">Hassan Ali</span>
+                                    <span class="message-time">10 min ago</span>
+                                </div>
+                                <div class="message-text">Technical support request - resolved by AI.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h4>Performance Metrics</h4>
+                        <div style="margin-bottom: 15px;">
+                            <label>Response Time</label>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 85%"></div>
+                            </div>
+                            <small>Average: 2.3 seconds</small>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <label>User Satisfaction</label>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 92%"></div>
+                            </div>
+                            <small>92% positive feedback</small>
+                        </div>
+                        <div>
+                            <label>Memory Usage</label>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 67%"></div>
+                            </div>
+                            <small>67% of allocated memory</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages Tab -->
+        <div id="messages" class="tab-content">
+            <div class="section">
+                <h3>💬 Message Management</h3>
+                <div class="alert alert-success">
+                    <strong>Connected!</strong> WhatsApp connector is active and processing messages.
+                </div>
+                
+                <div class="form-group">
+                    <label>Test Message Send</label>
+                    <input type="text" class="form-control" placeholder="Enter phone number (e.g., +923001234567)" id="testPhone">
+                </div>
+                <div class="form-group">
+                    <textarea class="form-control" rows="3" placeholder="Type your test message here..." id="testMessage"></textarea>
+                </div>
+                <button class="btn" onclick="sendTestMessage()">📤 Send Test Message</button>
+                
+                <div class="message-list" style="margin-top: 20px;">
+                    <h4>Recent Messages</h4>
+                    <div class="message-item">
+                        <div class="message-header">
+                            <span class="message-user">+923001234567</span>
+                            <span class="message-time">Just now</span>
+                        </div>
+                        <div class="message-text">
+                            <strong>User:</strong> Kya aap mujhe product ki details de sakte hain?<br>
+                            <strong>AI:</strong> Bilkul! Main aapko hamari latest products ke bare mein batata hun...
+                        </div>
+                    </div>
+                    <div class="message-item">
+                        <div class="message-header">
+                            <span class="message-user">+923009876543</span>
+                            <span class="message-time">3 min ago</span>
+                        </div>
+                        <div class="message-text">
+                            <strong>User:</strong> Order status check karna hai<br>
+                            <strong>AI:</strong> Aapka order #12345 processing mein hai aur 2-3 din mein deliver hoga.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Tab -->
+        <div id="users" class="tab-content">
+            <div class="section">
+                <h3>👥 User & Role Management</h3>
+                
+                <div class="grid-2">
+                    <div class="card">
+                        <h4>Add New User</h4>
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="text" class="form-control" placeholder="+923001234567" id="newUserPhone">
+                        </div>
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" class="form-control" placeholder="User Name" id="newUserName">
+                        </div>
+                        <div class="form-group">
+                            <label>Role</label>
+                            <select class="form-control" id="newUserRole">
+                                <option value="user">User</option>
+                                <option value="admin">Admin</option>
+                                <option value="moderator">Moderator</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-success" onclick="addUser()">➕ Add User</button>
+                    </div>
+                    
+                    <div class="card">
+                        <h4>Current Users</h4>
+                        <div style="max-height: 300px; overflow-y: auto;">
+                            <div class="message-item">
+                                <div class="message-header">
+                                    <span class="message-user">Admin User</span>
+                                    <span style="background: #667eea; color: white; padding: 2px 8px; border-radius: 5px; font-size: 0.8rem;">ADMIN</span>
+                                </div>
+                                <div class="message-text">+923001234567</div>
+                            </div>
+                            <div class="message-item">
+                                <div class="message-header">
+                                    <span class="message-user">Ali Ahmed</span>
+                                    <span style="background: #51cf66; color: white; padding: 2px 8px; border-radius: 5px; font-size: 0.8rem;">USER</span>
+                                </div>
+                                <div class="message-text">+923009876543</div>
+                            </div>
+                            <div class="message-item">
+                                <div class="message-header">
+                                    <span class="message-user">Sara Khan</span>
+                                    <span style="background: #ffc107; color: black; padding: 2px 8px; border-radius: 5px; font-size: 0.8rem;">MOD</span>
+                                </div>
+                                <div class="message-text">+923005555555</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Config Tab -->
+        <div id="ai-config" class="tab-content">
+            <div class="section">
+                <h3>🧠 AI Configuration</h3>
+                
+                <div class="alert alert-warning">
+                    <strong>Note:</strong> Changes to AI configuration will restart the brain core system.
+                </div>
+                
+                <div class="form-group">
+                    <label>AI Model</label>
+                    <select class="form-control" id="aiModel">
+                        <option value="gpt-4">GPT-4 (Recommended)</option>
+                        <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                        <option value="claude-3">Claude-3</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Response Temperature (0.0 - 1.0)</label>
+                    <input type="range" class="form-control" min="0" max="1" step="0.1" value="0.7" id="temperature">
+                    <small>Current: <span id="tempValue">0.7</span> (Higher = More Creative)</small>
+                </div>
+                
+                <div class="form-group">
+                    <label>Max Response Length</label>
+                    <input type="number" class="form-control" value="150" id="maxLength">
+                </div>
+                
+                <div class="form-group">
+                    <label>System Prompt</label>
+                    <textarea class="form-control" rows="4" id="systemPrompt">You are a helpful WhatsApp assistant for a Pakistani business. Respond in Urdu/English mix as appropriate. Be friendly, professional, and helpful.</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Auto-Learning</label>
+                    <input type="checkbox" id="autoLearning" checked> Enable meta learning from conversations
+                </div>
+                
+                <button class="btn" onclick="updateAIConfig()">💾 Update AI Configuration</button>
+                <button class="btn btn-danger" onclick="resetAIMemory()">🧹 Reset AI Memory</button>
+            </div>
+        </div>
+
+        <!-- Training Tab -->
+        <div id="training" class="tab-content">
+            <div class="section">
+                <h3>📚 AI Training & Dataset</h3>
+                
+                <div class="grid-2">
+                    <div class="card">
+                        <h4>Upload Training Data</h4>
+                        <div class="form-group">
+                            <label>Training File (JSONL format)</label>
+                            <input type="file" class="form-control" accept=".jsonl" id="trainingFile">
+                        </div>
+                        <button class="btn" onclick="uploadTrainingData()">📤 Upload Dataset</button>
+                        
+                        <h4 style="margin-top: 20px;">Quick Add Training Example</h4>
+                        <div class="form-group">
+                            <label>User Input</label>
+                            <input type="text" class="form-control" placeholder="Salam, kya haal hai?" id="trainInput">
+                        </div>
+                        <div class="form-group">
+                            <label>Expected Response</label>
+                            <textarea class="form-control" rows="3" placeholder="Wa alaykum salam! Main theek hun, aap kaise hain?" id="trainOutput"></textarea>
+                        </div>
+                        <button class="btn btn-success" onclick="addTrainingExample()">➕ Add Example</button>
+                    </div>
+                    
+                    <div class="card">
+                        <h4>Training Statistics</h4>
+                        <div style="margin-bottom: 15px;">
+                            <strong>Dataset Size:</strong> 1,247 examples
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <strong>Last Training:</strong> 2 hours ago
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <strong>Model Accuracy:</strong> 94.2%
+                        </div>
+                        
+                        <h4>Recent Training Examples</h4>
+                        <div style="max-height: 200px; overflow-y: auto; background: #f8f9fa; padding: 10px; border-radius: 5px;">
+                            <div style="margin-bottom: 10px; padding: 8px; background: white; border-radius: 5px;">
+                                <strong>Input:</strong> "Order cancel karna hai"<br>
+                                <strong>Output:</strong> "Main aapka order cancel kar deta hun. Kya main reason puch sakta hun?"
+                            </div>
+                            <div style="margin-bottom: 10px; padding: 8px; background: white; border-radius: 5px;">
+                                <strong>Input:</strong> "Product ki warranty kitni hai?"<br>
+                                <strong>Output:</strong> "Hamari products pe 1 saal ki comprehensive warranty hai."
+                            </div>
+                        </div>
+                        
+                        <button class="btn" onclick="startTraining()" style="margin-top: 15px;">🚀 Start New Training</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div id="settings" class="tab-content">
+            <div class="section">
+                <h3>⚙️ System Settings</h3>
+                
+                <div class="grid-2">
+                    <div class="card">
+                        <h4>WhatsApp Configuration</h4>
+                        <div class="form-group">
+                            <label>WhatsApp API Token</label>
+                            <input type="password" class="form-control" placeholder="Enter API token" id="whatsappToken">
+                        </div>
+                        <div class="form-group">
+                            <label>Phone Number ID</label>
+                            <input type="text" class="form-control" placeholder="Phone number ID" id="phoneNumberId">
+                        </div>
+                        <div class="form-group">
+                            <label>Webhook URL</label>
+                            <input type="url" class="form-control" placeholder="https://yourserver.com/webhook" id="webhookUrl">
+                        </div>
+                        <button class="btn" onclick="updateWhatsAppConfig()">💾 Update WhatsApp Config</button>
+                    </div>
+                    
+                    <div class="card">
+                        <h4>System Controls</h4>
+                        <div class="form-group">
+                            <label>Auto Response</label>
+                            <input type="checkbox" id="autoResponse" checked> Enable automatic responses
+                        </div>
+                        <div class="form-group">
+                            <label>Response Delay (seconds)</label>
+                            <input type="number" class="form-control" value="2" min="0" max="10" id="responseDelay">
+                        </div>
+                        <div class="form-group">
+                            <label>Max Messages per Hour</label>
+                            <input type="number" class="form-control" value="100" id="messageLimit">
+                        </div>
+                        
+                        <div style="margin-top: 20px;">
+                            <button class="btn btn-success" onclick="startSystem()">▶️ Start System</button>
+                            <button class="btn btn-danger" onclick="stopSystem()">⏹️ Stop System</button>
+                            <button class="btn" onclick="restartSystem()">🔄 Restart System</button>
+                        </div>
+                        
+                        <div style="margin-top: 20px;">
+                            <button class="btn" onclick="exportData()">📥 Export Data</button>
+                            <button class="btn" onclick="importData()">📤 Import Data</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card" style="margin-top: 20px;">
+                    <h4>System Logs</h4>
+                    <div style="background: #000; color: #00ff00; padding: 15px; border-radius: 5px; font-family: monospace; max-height: 200px; overflow-y: auto;" id="systemLogs">
+                        [2024-06-21 15:30:21] WPAI-Master started successfully<br>
+                        [2024-06-21 15:30:22] WhatsApp connector initialized<br>
+                        [2024-06-21 15:30:23] AI brain core loaded<br>
+                        [2024-06-21 15:30:24] Memory system ready<br>
+                        [2024-06-21 15:30:25] API server running on port 5000<br>
+                        [2024-06-21 15:30:26] System ready to process messages<br>
+                    </div>
+                    <button class="btn" onclick="clearLogs()" style="margin-top: 10px;">🧹 Clear Logs</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        function showTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        // Update temperature display
+        document.getElementById('temperature').addEventListener('input', function() {
+            document.getElementById('tempValue').textContent = this.value;
+        });
+
+        // Mock functions for demo purposes
+        function sendTestMessage() {
+            const phone = document.getElementById('testPhone').value;
+            const message = document.getElementById('testMessage').value;
+            
+            if (!phone || !message) {
+                alert('Please enter both phone number and message');
+                return;
+            }
+            
+            alert(`Test message sent to ${phone}:\n"${message}"`);
+            
+            // Clear inputs
+            document.getElementById('testPhone').value = '';
+            document.getElementById('testMessage').value = '';
+        }
+
+        function addUser() {
+            const phone = document.getElementById('newUserPhone').value;
+            const name = document.getElementById('newUserName').value;
+            const role = document.getElementById('newUserRole').value;
+            
+            if (!phone || !name) {
+                alert('Please fill all fields');
+                return;
+            }
+            
+            alert(`User added successfully:\nName: ${name}\nPhone: ${phone}\nRole: ${role}`);
+            
+            // Clear inputs
+            document.getElementById('newUserPhone').value = '';
+            document.getElementById('newUserName').value = '';
+            document.getElementById('newUserRole').value = 'user';
+        }
+
+        function updateAIConfig() {
+            const model = document.getElementById('aiModel').value;
+            const temp = document.getElementById('temperature').value;
+            const maxLen = document.getElementById('maxLength').value;
+            
+            alert(`AI Configuration Updated:\nModel: ${model}\nTemperature: ${temp}\nMax Length: ${maxLen}`);
+        }
+
+        function resetAIMemory() {
+            if (confirm('Are you sure you want to reset AI memory? This will delete all learned patterns.')) {
+                alert('AI Memory has been reset successfully!');
+                // Add animation to show memory clearing
+                document.getElementById('aiAccuracy').textContent = '0%';
+                setTimeout(() => {
+                    document.getElementById('aiAccuracy').textContent = '85%';
+                }, 2000);
+            }
+        }
+
+        function uploadTrainingData() {
+            const file = document.getElementById('trainingFile').files[0];
+            if (!file) {
+                alert('Please select a training file');
+                return;
+            }
+            
+            alert(`Training data file "${file.name}" uploaded successfully!`);
+            document.getElementById('trainingFile').value = '';
+        }
+
+        function addTrainingExample() {
+            const input = document.getElementById('trainInput').value;
+            const output = document.getElementById('trainOutput').value;
+            
+            if (!input || !output) {
+                alert('Please fill both input and output fields');
+                return;
+            }
+            
+            alert('Training example added successfully!');
+            document.getElementById('trainInput').value = '';
+            document.getElementById('trainOutput').value = '';
+        }
+
+        function startTraining() {
+            if (confirm('Start new AI training? This may take several minutes.')) {
+                alert('Training started! You will be notified when complete.');
+                // Simulate training progress
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += 10;
+                    if (progress <= 100) {
+                        console.log(`Training progress: ${progress}%`);
+                    } else {
+                        clearInterval(interval);
+                        alert('Training completed successfully!');
+                    }
+                }, 1000);
+            }
+        }
+
+        function updateWhatsAppConfig() {
+            const token = document.getElementById('whatsappToken').value;
+            const phoneId = document.getElementById('phoneNumberId').value;
+            const webhook = document.getElementById('webhookUrl').value;
+            
+            if (!token || !phoneId) {
+                alert('Please fill required fields (Token and Phone Number ID)');
+                return;
+            }
+            
+            alert('WhatsApp configuration updated successfully!');
+        }
+
+        function startSystem() {
+            alert('System started successfully! 🚀');
+            addLog('System started by user');
+            updateSystemStatus('online');
+        }
+
+        function stopSystem() {
+            if (confirm('Are you sure you want to stop the system?')) {
+                alert('System stopped! ⏹️');
+                addLog('System stopped by user');
+                updateSystemStatus('offline');
+            }
+        }
+
+        function restartSystem() {
+            if (confirm('Restart the entire WPAI-Master system?')) {
+                alert('System restarting... 🔄');
+                addLog('System restart initiated');
+                setTimeout(() => {
+                    alert('System restarted successfully!');
+                    addLog('System restart completed');
+                }, 3000);
+            }
+        }
+
+        function exportData() {
+            alert('Exporting system data... This may take a few moments.');
+            setTimeout(() => {
+                // Create a mock download
+                const data = {
+                    users: 23,
+                    messages: 1247,
+                    training_examples: 1247,
+                    export_time: new Date().toISOString()
+                };
+                const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'wpai_master_export.json';
+                a.click();
+                URL.revokeObjectURL(url);
+                addLog('Data exported successfully');
+            }, 2000);
+        }
+
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    alert(`Importing data from ${file.name}...`);
+                    addLog(`Data import started: ${file.name}`);
+                    setTimeout(() => {
+                        alert('Data imported successfully!');
+                        addLog('Data import completed');
+                    }, 2000);
+                }
+            };
+            input.click();
+        }
+
+        function clearLogs() {
+            document.getElementById('systemLogs').innerHTML = '<span style="color: #666;">[Logs cleared]</span>';
+        }
+
+        function addLog(message) {
+            const logs = document.getElementById('systemLogs');
+            const timestamp = new Date().toLocaleString();
+            logs.innerHTML += `<br>[${timestamp}] ${message}`;
+            logs.scrollTop = logs.scrollHeight;
+        }
+
+        function updateSystemStatus(status) {
+            const indicators = document.querySelectorAll('.status-indicator');
+            indicators.forEach(indicator => {
+                if (status === 'online') {
+                    indicator.className = 'status-indicator status-online';
+                } else {
+                    indicator.className = 'status-indicator status-offline';
+                }
+            });
+        }
+
+        // Auto-update stats (simulation)
+        function updateStats() {
+            const totalMessages = document.getElementById('totalMessages');
+            const activeUsers = document.getElementById('activeUsers');
+            const aiAccuracy = document.getElementById('aiAccuracy');
+            
+            // Simulate real-time updates
+            setInterval(() => {
+                const currentMessages = parseInt(totalMessages.textContent.replace(',', ''));
+                if (Math.random() > 0.7) { // 30% chance to update
+                    totalMessages.textContent = (currentMessages + Math.floor(Math.random() * 3) + 1).toLocaleString();
+                }
+                
+                if (Math.random() > 0.9) { // 10% chance to update users
+                    const currentUsers = parseInt(activeUsers.textContent);
+                    const change = Math.random() > 0.5 ? 1 : -1;
+                    const newUsers = Math.max(1, currentUsers + change);
+                    activeUsers.textContent = newUsers;
+                }
+            }, 5000);
+        }
+
+        // Initialize the dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStats();
+            
+            // Add some initial logs
+            setTimeout(() => addLog('Dashboard loaded successfully'), 1000);
+            setTimeout(() => addLog('All systems operational'), 2000);
+            
+            // Auto-refresh certain elements
+            setInterval(() => {
+                const now = new Date();
+                const timeElements = document.querySelectorAll('.message-time');
+                // This would normally update with real data from API
+            }, 30000);
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case '1':
+                        e.preventDefault();
+                        showTab('dashboard');
+                        break;
+                    case '2':
+                        e.preventDefault();
+                        showTab('messages');
+                        break;
+                    case '3':
+                        e.preventDefault();
+                        showTab('users');
+                        break;
+                    case '4':
+                        e.preventDefault();
+                        showTab('ai-config');
+                        break;
+                    case '5':
+                        e.preventDefault();
+                        showTab('training');
+                        break;
+                    case '6':
+                        e.preventDefault();
+                        showTab('settings');
+                        break;
+                }
+            }
+        });
+
+        // Add notification system
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type}`;
+            notification.innerHTML = `<strong>${type.toUpperCase()}:</strong> ${message}`;
+            notification.style.position = 'fixed';
+            notification.style.top = '20px';
+            notification.style.right = '20px';
+            notification.style.zIndex = '9999';
+            notification.style.maxWidth = '300px';
+            notification.style.animation = 'slideIn 0.3s ease';
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // Add CSS for notifications
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Example usage of notifications
+        setTimeout(() => {
+            showNotification('WPAI-Master Dashboard loaded successfully!', 'success');
+        }, 1000);
+    </script>
+</body>
+</html>
